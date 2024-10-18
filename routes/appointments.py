@@ -1,7 +1,7 @@
 # routes/appointments.py
 
 from flask import Blueprint, request, jsonify
-from models import Appointment  
+from models import Appointment, Bill  
 from models import Patient  
 from db import db
 
@@ -16,13 +16,23 @@ def create_appointment():
         patient_id=data['patient_id'],
         doctor_id=data['doctor_id'],
         appointment_date=data['appointment_date'],
-        status=data.get('status', 'scheduled (Unpaid)'),
+        status=data.get('status', 'Scheduled'),
         reason_for_visit=data.get('reason_for_visit', ''),
         notes=data.get('notes', ''),
         cost=data.get('cost', '1000')
     )
     
     db.session.add(new_appointment)
+
+    # Create a Bill record after creating the appointment
+    new_bill = Bill(
+        patient_id=new_appointment.patient_id,
+        appointment_id=new_appointment.id,
+        amount=float(data.get('cost', 1000)),  # Use the cost from the appointment or default to 1000
+        description=f"Bill for appointment"
+    )
+    
+    db.session.add(new_bill)
     db.session.commit()
     
     # Create Bill

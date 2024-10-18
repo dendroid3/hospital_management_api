@@ -1,7 +1,7 @@
 # routes/patients.py
 
 from flask import Blueprint, request, jsonify
-from models import Patient, Doctor, Bill
+from models import Patient, Doctor, Bill, Record, User
 from db import db
 
 patients_bp = Blueprint('patients', __name__)
@@ -10,6 +10,11 @@ patients_bp = Blueprint('patients', __name__)
 @patients_bp.route('/', methods=['POST'])
 def add_patient():
     data = request.get_json()
+    email = data['email']
+
+    if User.query.filter_by(email=email).first():
+        return jsonify({"message": "User already exists"}), 400
+
     new_patient = Patient(
         first_name=data['first_name'],
         last_name=data['last_name'],
@@ -22,6 +27,16 @@ def add_patient():
         emergency_contact_phone_number=data['emergency_contact_phone_number']
     )
     db.session.add(new_patient)
+
+    password = data['first_name'] + "." + data['last_name']
+    role = 2
+
+    new_user = User(email=email)
+    new_user.set_password(password)
+    new_user.set_role(role)  
+
+    db.session.add(new_user)
+
     db.session.commit()
     return jsonify({"message": "Patient added", "patient_id": new_patient.id}), 201
 
@@ -98,6 +113,27 @@ def get_bills_by_patient(patient_id):
             "creation_date": bill.creation_date,
             "amount": bill.amount,
             "description": bill.description  # Include the description field
+        })
+
+    return jsonify(results), 200
+
+@patients_bp.route('/<int:patient_id>/records', methods=['GET'])
+def get_records_for_patient(patient_id):
+    # Query all bills where the patient_id matches
+    records = Record.query.filter_by(patient_id=patient_id).all()
+
+    # Check if any bills are found
+    if not records:
+        return jsonify({'message': 'No records found for this patient'}), 404
+
+    # Prepare the results in JSON format
+    results = []
+    for record in records:
+        results.append({
+            "id": record.id,
+            "subject": record.subject,
+            "creation_date": record.creation_date,
+            "record": record.record,
         })
 
     return jsonify(results), 200

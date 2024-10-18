@@ -11,7 +11,7 @@ def register():
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
-    role = data.get('role', 3)
+    role = data.get('role', 1)
 
     if User.query.filter_by(email=email).first():
         return jsonify({"message": "User already exists"}), 400
@@ -35,7 +35,7 @@ def login():
     user = User.query.filter_by(email=email).first()
     if user and user.check_password(password):
         access_token = create_access_token(identity={'email': user.email})
-        return jsonify(access_token=access_token), 200
+        return jsonify(access_token=access_token, role=user.role, id=user.id), 200
     else:
         return jsonify({"message": "Invalid credentials"}), 401
 

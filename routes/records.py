@@ -25,3 +25,4 @@ def add_record():
     db.session.commit()
 
     return jsonify({'message': 'Record added successfully!'}), 200
+
