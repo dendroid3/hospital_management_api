@@ -104,6 +104,7 @@ def stk_push_request(phone_number, amount, checkout_request_id, description):
 
 @transactions_bp.route('/deposit', methods=['POST'])
 def initiate_mpesa_payment():
+    return jsonify({"message": "Failed to initiate STK Push"}), 200
 
     logger.info("Received payload: %s", request.json)
 
@@ -161,6 +162,7 @@ def mpesa_callback():
         # Extract relevant data from the callback payload
         checkout_request_id = data['Body']['stkCallback']['CheckoutRequestID']
         result_code = data['Body']['stkCallback']['ResultCode']
+        logger.info("checkout_request_id: %s", checkout_request_id)
 
         # Find the first transaction with the same checkout_request_id
         transaction = Transaction.query.filter_by(checkout_request_id=checkout_request_id).first()
