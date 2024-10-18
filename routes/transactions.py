@@ -93,7 +93,7 @@ def stk_push_request(phone_number, amount, checkout_request_id, description):
         "PartyB": shortcode,     # Business shortcode receiving the payment
         "PhoneNumber": phone_number,
         "CallBackURL": current_app.config['MPESA_CALLBACK_URL'],
-        "AccountReference": f"bill_#{checkout_request_id}",  # This can be an invoice number or description
+        "AccountReference": f"bill_id_{checkout_request_id}",  # This can be an invoice number or description
         "TransactionDesc": description
     }
 
