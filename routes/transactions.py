@@ -143,8 +143,6 @@ def initiate_mpesa_payment():
     
 @transactions_bp.route('/callback', methods=['POST'])
 def mpesa_callback():
-    return jsonify({"message": "Transaction and Bill updated successfully"}), 200
-
     # logger.info("Received payload: %s", request.json)
     logger.info("M-Pesa Callback Received")
     logger.info("Content Type: %s", request.content_type)
