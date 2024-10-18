@@ -29,7 +29,7 @@ def add_patient():
     db.session.add(new_patient)
 
     password = data['first_name'] + "." + data['last_name']
-    role = 2
+    role = 3
 
     new_user = User(email=email)
     new_user.set_password(password)
