@@ -94,10 +94,12 @@ def stk_push_request(phone_number, amount, checkout_request_id, description):
         "PartyA": phone_number,  # The phone number initiating the transaction
         "PartyB": shortcode,     # Business shortcode receiving the payment
         "PhoneNumber": phone_number,
-        "CallBackURL": current_app.config['MPESA_CALLBACK_URL'],
+        "CallBackURL": 'https://hospital-management-api-1-8u27.onrender.com/transactions/callback',
         "AccountReference": checkout_request_id,  # This can be an invoice number or description
         "TransactionDesc": description
     }
+
+    logger.info("Payload Data: %s", payload)
 
     response = requests.post(api_url, json=payload, headers=headers)
     return response.json()
