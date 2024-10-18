@@ -145,10 +145,16 @@ def initiate_mpesa_payment():
 def mpesa_callback():
     # logger.info("Received payload: %s", request.json)
     logger.info("M-Pesa Callback Received")
+    logger.info("Content Type: %s", request.content_type)
     logger.info("Request Method: %s", request.method)
     logger.info("Request URL: %s", request.url)
     logger.info("Request Headers: %s", request.headers)
     logger.info("Request Body: %s", request.get_data(as_text=True))
+
+    # Process the callback data
+    data = request.get_json()
+    if data:
+        logger.info("Callback Data: %s", data)
     try:
         data = request.get_json()
         
