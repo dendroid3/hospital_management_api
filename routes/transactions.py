@@ -5,8 +5,10 @@ from models import Transaction
 from models import Bill  
 import base64
 from datetime import datetime
+import logging
 
 transactions_bp = Blueprint('transactions', __name__)
+logger = logging.getLogger(__name__)
 
 @transactions_bp.route('/', methods=['POST'])
 def add_transaction():
@@ -102,6 +104,9 @@ def stk_push_request(phone_number, amount, checkout_request_id, description):
 
 @transactions_bp.route('/deposit', methods=['POST'])
 def initiate_mpesa_payment():
+
+    logger.info("Received payload: %s", request.json)
+
     data = request.get_json()
 
     bill_id = data['bill_id']
@@ -138,6 +143,8 @@ def initiate_mpesa_payment():
     
 @transactions_bp.route('/callback', methods=['POST'])
 def mpesa_callback():
+    logger.info("Received payload: %s", request.json)
+
     try:
         data = request.get_json()
         

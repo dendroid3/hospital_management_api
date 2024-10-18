@@ -12,11 +12,16 @@ from routes.bills import bills_bp
 from routes.records import records_bp
 from routes.transactions import transactions_bp
 
+import logging
 from config import Config
 
 from db import db
 
 app = Flask(__name__)
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 app.config.from_object(Config)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hospital.db'
