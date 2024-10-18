@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, current_app
 from db import db 
 import requests
 from models import Transaction  
+from models import Bill  
 import base64
 from datetime import datetime
 
@@ -27,6 +28,31 @@ def add_transaction():
     db.session.commit()
 
     return jsonify({"message": "Transaction added", "transaction_id": new_transaction.id}), 201
+
+@transactions_bp.route('/', methods=['GET'])
+def get_all_transactions():
+    try:
+        # Query all transactions from the database
+        transactions = Transaction.query.all()
+
+        # Prepare the transactions list in JSON format
+        transactions_list = [
+            {
+                "id": transaction.id,
+                "checkout_request_id": transaction.checkout_request_id,
+                "bill_id": transaction.bill_id,
+                "status": transaction.status,
+                "amount": transaction.amount,
+                "paying_phone_number": transaction.paying_phone_number,
+                "receipt_number": transaction.receipt_number,
+                "transaction_date": transaction.transaction_date
+            }
+            for transaction in transactions
+        ]
+
+        return jsonify(transactions_list), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # Function to get OAuth token
@@ -67,7 +93,7 @@ def stk_push_request(phone_number, amount, checkout_request_id, description):
         "PartyB": shortcode,     # Business shortcode receiving the payment
         "PhoneNumber": phone_number,
         "CallBackURL": current_app.config['MPESA_CALLBACK_URL'],
-        "AccountReference": checkout_request_id,  # This can be an invoice number or description
+        "AccountReference": f"bill_#{checkout_request_id}",  # This can be an invoice number or description
         "TransactionDesc": description
     }
 
@@ -78,27 +104,28 @@ def stk_push_request(phone_number, amount, checkout_request_id, description):
 def initiate_mpesa_payment():
     data = request.get_json()
 
+    bill_id = data['bill_id']
+    bill = Bill.query.get(bill_id)
+
     # Extract the details from the request
     phone_number = data['phone_number']
-    amount = data['amount']
-    bill_id = data['bill_id']
+    amount = bill.amount
     description = data.get('description', 'Payment')  # Optional description
-    checkout_request_id = data['checkout_request_id']
 
     # Call the STK Push function
-    stk_response = stk_push_request(phone_number, amount, checkout_request_id, description)
+    stk_response = stk_push_request(phone_number, amount, bill_id, description)
 
     # return stk_response
     # Check if the STK Push was successful
     if stk_response.get('ResponseCode') == '0':
-        # STK Push request was successfully sent
+        checkout_request_id = stk_response.get('CheckoutRequestID')
+
         transaction = Transaction(
             checkout_request_id=checkout_request_id,
             bill_id=bill_id,
             status="Pending",
             amount=amount,
             paying_phone_number=phone_number,
-            receipt_number= "",  # Will be updated upon receiving the STK callback
             transaction_date=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         )
         db.session.add(transaction)
@@ -109,3 +136,36 @@ def initiate_mpesa_payment():
         # Handle errors from the STK push request
         return jsonify({"message": "Failed to initiate STK Push", "error": stk_response.get('errorMessage')}), 400
     
+@transactions_bp.route('/callback', methods=['POST'])
+def mpesa_callback():
+    try:
+        data = request.get_json()
+        
+        # Extract relevant data from the callback payload
+        checkout_request_id = data['Body']['stkCallback']['CheckoutRequestID']
+        result_code = data['Body']['stkCallback']['ResultCode']
+
+        # Find the first transaction with the same checkout_request_id
+        transaction = Transaction.query.filter_by(checkout_request_id=checkout_request_id).first()
+
+        if transaction:
+            if result_code == 0:  # Payment was successful (MPesa returns 0 for success)
+                # Update the transaction status to "Paid"
+                transaction.status = "Paid"
+
+                # Find the related bill and update its status to "Paid"
+                bill = Bill.query.filter_by(id=transaction.bill_id).first()
+                if bill:
+                    bill.status = "Paid"
+
+                # Commit the changes to the database
+                db.session.commit()
+                return jsonify({"message": "Transaction and Bill updated successfully"}), 200
+            else:
+                # If payment was not successful, do nothing and return
+                return jsonify({"message": "Payment not successful, no updates made"}), 200
+        else:
+            return jsonify({"error": "Transaction not found"}), 404
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
