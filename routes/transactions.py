@@ -143,8 +143,11 @@ def initiate_mpesa_payment():
     
 @transactions_bp.route('/callback', methods=['POST'])
 def mpesa_callback():
-    logger.info("Received payload: %s", request.json)
-
+    # logger.info("Received payload: %s", request.json)
+    logger.info("Request Method: %s", request.method)
+    logger.info("Request URL: %s", request.url)
+    logger.info("Request Headers: %s", request.headers)
+    logger.info("Request Body: %s", request.get_data(as_text=True))
     try:
         data = request.get_json()
         
