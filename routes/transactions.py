@@ -57,7 +57,7 @@ def get_all_transactions():
 
 # Function to get OAuth token
 def get_mpesa_access_token(consumer_key, consumer_secret):
-    api_url = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
+    api_url = "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
     r = requests.get(api_url, auth=(consumer_key, consumer_secret))
     json_response = r.json()
     access_token = json_response['access_token']
@@ -67,7 +67,7 @@ def get_mpesa_access_token(consumer_key, consumer_secret):
 def stk_push_request(phone_number, amount, checkout_request_id, description):
     # Safaricom API details
     access_token = get_mpesa_access_token(current_app.config['MPESA_CONSUMER_KEY'], current_app.config['MPESA_CONSUMER_SECRET'])
-    api_url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
+    api_url = "https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
     
     headers = {"Authorization": f"Bearer {access_token}"}
 
@@ -78,8 +78,8 @@ def stk_push_request(phone_number, amount, checkout_request_id, description):
     # password = base64.b64encode(f"{'174379'}{'c9ad901de83c496e631b8f3f6bbda12924ee956eb4684a00c2da50946d63c143'}{timestamp}".encode()).decode('utf-8')
    
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    passkey = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919'
-    data_to_encode = '174379' + passkey + timestamp
+    passkey = 'c9ad901de83c496e631b8f3f6bbda12924ee956eb4684a00c2da50946d63c143'
+    data_to_encode = '4115361' + passkey + timestamp
     password = base64.b64encode(data_to_encode.encode('utf-8')).decode('utf-8')
 
     # STK Push payload
