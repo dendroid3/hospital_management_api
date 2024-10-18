@@ -155,6 +155,7 @@ def get_patients_by_doctor(doctor_id):
                 "id": bill.id,
                 "status": bill.status,
                 "amount": bill.amount,
+                "description": bill.description,
                 "creation_date": bill.creation_date
             }
             for bill in bills
@@ -165,6 +166,7 @@ def get_patients_by_doctor(doctor_id):
             "first_name": patient.first_name,
             "last_name": patient.last_name,
             "gender": patient.gender,
+            "emergency_contact_phone_number": patient.emergency_contact_phone_number,
             "date_of_birth": patient.date_of_birth,
             "email": patient.email,
             "phone_number": patient.phone_number,

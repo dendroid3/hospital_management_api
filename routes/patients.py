@@ -1,7 +1,7 @@
 # routes/patients.py
 
 from flask import Blueprint, request, jsonify
-from models import Patient, Doctor
+from models import Patient, Doctor, Bill
 from db import db
 
 patients_bp = Blueprint('patients', __name__)
@@ -79,3 +79,25 @@ def delete_patient(patient_id):
     db.session.delete(patient)
     db.session.commit()
     return jsonify({"message": "Patient deleted"}), 204
+
+@patients_bp.route('/<int:patient_id>/bills', methods=['GET'])
+def get_bills_by_patient(patient_id):
+    # Query all bills where the patient_id matches
+    bills = Bill.query.filter_by(patient_id=patient_id).all()
+
+    # Check if any bills are found
+    if not bills:
+        return jsonify({'message': 'No bills found for this patient'}), 404
+
+    # Prepare the results in JSON format
+    results = []
+    for bill in bills:
+        results.append({
+            "id": bill.id,
+            "status": bill.status,
+            "creation_date": bill.creation_date,
+            "amount": bill.amount,
+            "description": bill.description  # Include the description field
+        })
+
+    return jsonify(results), 200

@@ -25,6 +25,7 @@ def create_appointment():
     db.session.add(new_appointment)
     db.session.commit()
     
+    # Create Bill
     return jsonify({"message": "Appointment created successfully", "appointment_id": new_appointment.id}), 201
 
 # Endpoint to fetch all appointments for a specific doctor

@@ -16,6 +16,7 @@ def create_bill():
     new_bill = Bill(
         status=data['status'],
         patient_id=data['patient_id'],
+        description=data['description'],
         amount=data['amount']
     )
 

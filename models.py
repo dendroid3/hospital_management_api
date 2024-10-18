@@ -78,6 +78,25 @@ class Bill(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     status = db.Column(db.String(50), nullable=False, default="Pending")  # Example statuses: "Paid", "Pending", etc.
     patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
+    appointment_id = db.Column(db.Integer, db.ForeignKey('appointment.id'), nullable=True)
+    transaction_id = db.Column(db.Integer, db.ForeignKey('transactions.id'), nullable=True)
     creation_date = db.Column(db.DateTime, default=db.func.current_timestamp()) 
     amount = db.Column(db.Float, nullable=False)
+    description = db.Column(db.String(200))
+
     patient = db.relationship('Patient', backref=db.backref('bills', lazy=True))
+
+class Transaction(db.Model):
+    __tablename__ = 'transactions'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    checkout_request_id = db.Column(db.String, nullable=False)
+    bill_id = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.String, nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    paying_phone_number = db.Column(db.String, nullable=False)
+    receipt_number = db.Column(db.String, unique=True, nullable=True)
+    transaction_date = db.Column(db.String, nullable=False) 
+    
+    def __repr__(self):
+        return f'<Transaction {self.id}>'
