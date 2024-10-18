@@ -104,7 +104,6 @@ def stk_push_request(phone_number, amount, checkout_request_id, description):
 
 @transactions_bp.route('/deposit', methods=['POST'])
 def initiate_mpesa_payment():
-    return jsonify({"message": "Failed to initiate STK Push"}), 200
 
     logger.info("Received payload: %s", request.json)
 
@@ -144,6 +143,8 @@ def initiate_mpesa_payment():
     
 @transactions_bp.route('/callback', methods=['POST'])
 def mpesa_callback():
+    return jsonify({"message": "Transaction and Bill updated successfully"}), 200
+
     # logger.info("Received payload: %s", request.json)
     logger.info("M-Pesa Callback Received")
     logger.info("Content Type: %s", request.content_type)
