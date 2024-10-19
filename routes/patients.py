@@ -28,11 +28,14 @@ def add_patient():
     )
     db.session.add(new_patient)
 
+    db.session.commit()
+
     password = data['first_name'] + "." + data['last_name']
     role = 3
 
     new_user = User(email=email)
     new_user.set_password(password)
+    new_user.set_patient_id(new_patient.id)
     new_user.set_role(role)  
 
     db.session.add(new_user)

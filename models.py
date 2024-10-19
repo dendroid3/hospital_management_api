@@ -5,6 +5,8 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(50), unique=True, nullable=False)
     password_hash = db.Column(db.String(100), nullable=False)
+    doctor_id = db.Column(db.String(100), nullable=True)
+    patient_id = db.Column(db.String(100), nullable=True)
     role = db.Column(db.Integer, nullable=False, default=1)
 
     def set_password(self, password):
@@ -18,6 +20,12 @@ class User(db.Model):
             self.role = role
         else:
             raise ValueError("Role must be between 1 and 3")
+        
+    def set_doctor_id(self, doctor_id):
+        self.doctor_id = doctor_id
+
+    def set_patient_id(self, patient_id):
+        self.patient_id = patient_id
         
 class Doctor(db.Model):
     id = db.Column(db.Integer, primary_key=True)

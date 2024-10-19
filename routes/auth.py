@@ -35,7 +35,15 @@ def login():
     user = User.query.filter_by(email=email).first()
     if user and user.check_password(password):
         access_token = create_access_token(identity={'email': user.email})
-        return jsonify(access_token=access_token, role=user.role, id=user.id), 200
+
+        if user.role == 2:
+            return jsonify(access_token=access_token, role=user.role, id=user.id, doctor_id=user.doctor_id), 200
+        
+        if user.role == 3:
+            return jsonify(access_token=access_token, role=user.role, id=user.id, patient_id=user.patient_id), 200
+        else:
+            return jsonify(access_token=access_token, role=user.role, id=user.id), 200
+            
     else:
         return jsonify({"message": "Invalid credentials"}), 401
 

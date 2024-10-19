@@ -12,7 +12,7 @@ from routes.bills import bills_bp
 from routes.records import records_bp
 from routes.transactions import transactions_bp
 
-import logging
+import logging  
 from config import Config
 
 from db import db

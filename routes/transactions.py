@@ -94,7 +94,7 @@ def stk_push_request(phone_number, amount, checkout_request_id, description):
         "PartyA": phone_number,  # The phone number initiating the transaction
         "PartyB": shortcode,     # Business shortcode receiving the payment
         "PhoneNumber": phone_number,
-        "CallBackURL": 'https://hospital-management-api-1-8u27.onrender.com/transactions/callback',
+        "CallBackURL": 'https://geographical-euphemia-wazo-tank-f4308d3f.koyeb.app/transactions/callback',
         "AccountReference": checkout_request_id,  # This can be an invoice number or description
         "TransactionDesc": description
     }

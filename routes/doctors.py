@@ -41,6 +41,7 @@ def add_doctor():
 
     new_user = User(email=email)
     new_user.set_password(password)
+    new_user.set_doctor_id(new_doctor.id)
     new_user.set_role(role)  
 
     db.session.add(new_user)
