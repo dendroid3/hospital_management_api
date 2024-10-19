@@ -79,7 +79,7 @@ def stk_push_request(phone_number, amount, bill_id, description):
     # passkey = current_app.config['MPESA_PASSKEY']
     # timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
     # password = base64.b64encode(f"{'174379'}{'c9ad901de83c496e631b8f3f6bbda12924ee956eb4684a00c2da50946d63c143'}{timestamp}".encode()).decode('utf-8')
-    transaction = Transaction.query.order_by(desc(Transaction.id)).all()
+    transaction = Transaction.query.order_by(desc(Transaction.id)).first()
    
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     passkey = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919'
