@@ -6,6 +6,7 @@ from models import Bill
 import base64
 from datetime import datetime
 import logging
+from sqlalchemy import desc
 
 transactions_bp = Blueprint('transactions', __name__)
 logger = logging.getLogger(__name__)
@@ -66,7 +67,7 @@ def get_mpesa_access_token(consumer_key, consumer_secret):
     return access_token
 
 # Function to initiate STK push
-def stk_push_request(phone_number, amount, checkout_request_id, description):
+def stk_push_request(phone_number, amount, bill_id, description):
     # Safaricom API details
     access_token = get_mpesa_access_token(current_app.config['MPESA_CONSUMER_KEY'], current_app.config['MPESA_CONSUMER_SECRET'])
     api_url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
@@ -78,6 +79,7 @@ def stk_push_request(phone_number, amount, checkout_request_id, description):
     # passkey = current_app.config['MPESA_PASSKEY']
     # timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
     # password = base64.b64encode(f"{'174379'}{'c9ad901de83c496e631b8f3f6bbda12924ee956eb4684a00c2da50946d63c143'}{timestamp}".encode()).decode('utf-8')
+    transaction = Transaction.query.order_by(desc(Transaction.id)).all()
    
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     passkey = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919'
@@ -95,7 +97,7 @@ def stk_push_request(phone_number, amount, checkout_request_id, description):
         "PartyB": shortcode,     # Business shortcode receiving the payment
         "PhoneNumber": phone_number,
         "CallBackURL": 'https://geographical-euphemia-wazo-tank-f4308d3f.koyeb.app/transactions/callback',
-        "AccountReference": checkout_request_id,  # This can be an invoice number or description
+        "AccountReference": f"{transaction.id}:_bill_{bill_id}",  
         "TransactionDesc": description
     }
 
