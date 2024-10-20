@@ -97,7 +97,7 @@ def stk_push_request(phone_number, amount, bill_id, description):
         "PartyB": shortcode,     # Business shortcode receiving the payment
         "PhoneNumber": phone_number,
         "CallBackURL": 'https://geographical-euphemia-wazo-tank-f4308d3f.koyeb.app/transactions/callback',
-        "AccountReference": f"{transaction.id}:_bill_{bill_id}",  
+        "AccountReference": f"{transaction.id}_bill_{bill_id}",  
         "TransactionDesc": description
     }
 

@@ -3,6 +3,7 @@
 from flask import Blueprint, request, jsonify
 from models import Patient, Doctor, Bill, Record, User
 from db import db
+from sqlalchemy import desc
 
 patients_bp = Blueprint('patients', __name__)
 
@@ -101,7 +102,7 @@ def delete_patient(patient_id):
 @patients_bp.route('/<int:patient_id>/bills', methods=['GET'])
 def get_bills_by_patient(patient_id):
     # Query all bills where the patient_id matches
-    bills = Bill.query.filter_by(patient_id=patient_id).all()
+    bills = Bill.query.filter_by(patient_id=patient_id).order_by(desc(Bill.creation_date)).all()
 
     # Check if any bills are found
     if not bills:

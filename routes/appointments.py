@@ -2,6 +2,7 @@
 
 from flask import Blueprint, request, jsonify
 from models import Appointment, Bill  
+from sqlalchemy import desc
 from models import Patient  
 from db import db
 
@@ -29,7 +30,7 @@ def create_appointment():
         patient_id=new_appointment.patient_id,
         appointment_id=new_appointment.id,
         amount=float(data.get('cost', 1000)),  # Use the cost from the appointment or default to 1000
-        description=f"Bill for appointment"
+        description=f"Bill for appointment  p"
     )
     
     db.session.add(new_bill)
@@ -41,7 +42,7 @@ def create_appointment():
 # Endpoint to fetch all appointments for a specific doctor
 @appointments_bp.route('/doctor/<int:doctor_id>', methods=['GET'])
 def get_appointments_by_doctor(doctor_id):
-    appointments = Appointment.query.filter_by(doctor_id=doctor_id).all()
+    appointments = Appointment.query.filter_by(doctor_id=doctor_id).order_by(desc(Appointment.created_at)).all()
     results = []
     
     for appointment in appointments:
@@ -75,7 +76,8 @@ def get_appointments_by_doctor(doctor_id):
 # Endpoint to fetch all appointments for a specific patient
 @appointments_bp.route('/patient/<int:patient_id>', methods=['GET'])
 def get_appointments_by_patient(patient_id):
-    appointments = Appointment.query.filter_by(patient_id=patient_id).all()
+    appointments = Appointment.query.filter_by(patient_id=patient_id).order_by(desc(Appointment.created_at)).all()
+    
     results = []
     
     for appointment in appointments:
